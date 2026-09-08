@@ -4,18 +4,13 @@ NETRA-AI Worker — DR Classification Service.
 Grades a fundus image on the APTOS 0–4 scale and returns
 a continuous referable-probability score.
 
-Architecture: EfficientNet-B0 (pre-trained on ImageNet, fine-tuned
-on APTOS/EyePACS).
-
-╔══════════════════════════════════════════════════════════╗
-║  STUB MODE: When no model weights are found at the      ║
-║  configured path, this service returns realistic mock    ║
-║  predictions so the full pipeline can be integration-    ║
-║  tested before the ML friend delivers weights.           ║
-║                                                          ║
-║  ML FRIEND: See model/README.md for instructions on      ║
-║  how to plug in your trained model.                      ║
-╚══════════════════════════════════════════════════════════╝
+Real model:
+EfficientNet-B0, trained for five DR classes:
+0 = No DR
+1 = Mild NPDR
+2 = Moderate NPDR
+3 = Severe NPDR
+4 = Proliferative DR
 """
 
 from __future__ import annotations
@@ -24,12 +19,15 @@ import hashlib
 import logging
 import random
 from dataclasses import dataclass
-from pathlib import Path
 
 import numpy as np
 
 from app.config import settings
-from app.utils.image_processing import resize_for_model, bgr_to_rgb, normalize_for_model
+from app.utils.image_processing import (
+    resize_for_model,
+    bgr_to_rgb,
+    normalize_for_model,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -37,48 +35,33 @@ logger = logging.getLogger(__name__)
 @dataclass
 class ClassificationOutput:
     """Raw output from the classifier."""
-    ai_grade: int            # 0–4
-    referable_probability: float  # 0.0–1.0
-    class_probabilities: list[float]  # Per-class softmax [p0, p1, p2, p3, p4]
+    ai_grade: int
+    referable_probability: float
+    class_probabilities: list[float]
 
 
 class DRClassifier:
     """
-    Diabetic Retinopathy classifier.
+    Diabetic Retinopathy five-class classifier.
 
-    Automatically switches between real inference and stub mode
-    based on whether weight files exist.
-
-    ── FOR THE ML FRIEND ──────────────────────────────────────
-    To integrate your trained model:
-
-    1. Save your trained EfficientNet-B0 weights as a .pt file
-       (using torch.save(model.state_dict(), path)).
-
-    2. Place it at: model/weights/classifier.pt
-
-    3. Update the `_load_real_model()` and `_real_predict()`
-       methods below to match your model's exact architecture
-       and preprocessing.
-
-    See model/README.md for full instructions.
-    ───────────────────────────────────────────────────────────
+    Uses classifier.pt when the model file exists.
+    Falls back to deterministic stub predictions otherwise.
     """
 
     MODEL_NAME = "EfficientNet-B0"
-    VERSION = "0.1.0-stub"
+    VERSION = "1.0.0"
 
     def __init__(self) -> None:
         self.weights_path = settings.classifier_weights
         self.stub_mode = True
         self.model = None
+        self.device = None
 
         if self.weights_path.exists():
             self._load_real_model()
         else:
             logger.warning(
-                "Classifier weights not found at '%s' — running in STUB MODE. "
-                "See model/README.md to integrate real weights.",
+                "Classifier weights not found at '%s' — running in STUB MODE.",
                 self.weights_path,
             )
 
@@ -88,39 +71,54 @@ class DRClassifier:
 
     def _load_real_model(self) -> None:
         """
-        Load the real trained model from disk.
-
-        ╔═══════════════════════════════════════════════════╗
-        ║  ML FRIEND: Replace this method's body with your  ║
-        ║  actual model loading code.                       ║
-        ╚═══════════════════════════════════════════════════╝
+        Build the same five-class EfficientNet-B0 architecture used in
+        Colab, then load the tensor-only classifier.pt state_dict.
         """
         try:
             import torch
-            import torchvision.models as models
+            import torch.nn as nn
+            from torchvision.models import efficientnet_b0
 
-            # ── REPLACE THIS BLOCK ────────────────────────
-            # Example: loading an EfficientNet-B0 with 5 output classes
-            self.model = models.efficientnet_b0(weights=None)
-            # Replace the classifier head for 5 DR grades
-            in_features = self.model.classifier[1].in_features
-            self.model.classifier[1] = torch.nn.Linear(in_features, 5)
-            # Load trained weights
+            self.device = torch.device(
+                "cuda" if torch.cuda.is_available() else "cpu"
+            )
+
+            # Create the exact architecture used during training.
+            model = efficientnet_b0(weights=None)
+
+            # Your trained model has five APTOS DR-grade outputs.
+            model.classifier[1] = nn.Linear(
+                model.classifier[1].in_features,
+                5,
+            )
+
+            # classifier.pt was saved with model.state_dict(), so it is
+            # a tensor-only OrderedDict and safely supports weights_only=True.
             state_dict = torch.load(
                 self.weights_path,
-                map_location=torch.device("cpu"),
+                map_location=self.device,
                 weights_only=True,
             )
-            self.model.load_state_dict(state_dict)
-            self.model.eval()
-            # ── END REPLACE ───────────────────────────────
 
+            model.load_state_dict(state_dict)
+            model.to(self.device)
+            model.eval()
+
+            self.model = model
             self.stub_mode = False
             self.VERSION = "1.0.0"
-            logger.info("Classifier model loaded successfully from '%s'", self.weights_path)
+
+            logger.info(
+                "Real EfficientNet-B0 five-class classifier loaded from '%s' on %s.",
+                self.weights_path,
+                self.device,
+            )
 
         except Exception:
-            logger.exception("Failed to load classifier weights — falling back to STUB MODE")
+            logger.exception(
+                "Failed to load classifier weights — falling back to STUB MODE"
+            )
+            self.model = None
             self.stub_mode = True
 
     def predict(self, image: np.ndarray) -> ClassificationOutput:
@@ -128,70 +126,76 @@ class DRClassifier:
         Predict DR grade for a BGR fundus image.
 
         Args:
-            image: BGR numpy array.
+            image: BGR OpenCV NumPy array.
 
         Returns:
-            ClassificationOutput with grade, probability, and per-class scores.
+            ClassificationOutput:
+              - ai_grade: 0–4
+              - referable_probability: P(grade 2) + P(grade 3) + P(grade 4)
+              - class_probabilities: softmax [P0, P1, P2, P3, P4]
         """
         if self.stub_mode:
             return self._stub_predict(image)
+
         return self._real_predict(image)
 
     def _real_predict(self, image: np.ndarray) -> ClassificationOutput:
-        """
-        Run real model inference.
-
-        ╔═══════════════════════════════════════════════════╗
-        ║  ML FRIEND: Update preprocessing if your model    ║
-        ║  uses different transforms (crop, augmentation,   ║
-        ║  normalization constants, etc.).                   ║
-        ╚═══════════════════════════════════════════════════╝
-        """
+        """Run five-class EfficientNet-B0 inference."""
         import torch
         import torchvision.transforms as T
 
-        # Preprocess: resize → RGB → normalise → tensor → batch
+        # Uses existing project helpers:
+        # BGR -> resized 224x224 -> RGB.
         resized = resize_for_model(image)
         rgb = bgr_to_rgb(resized)
 
         transform = T.Compose([
             T.ToTensor(),
             T.Normalize(
-                mean=[0.485, 0.456, 0.406],  # ImageNet defaults
+                mean=[0.485, 0.456, 0.406],
                 std=[0.229, 0.224, 0.225],
             ),
         ])
 
-        tensor = transform(rgb).unsqueeze(0)  # [1, 3, 224, 224]
+        # Shape: [1, 3, 224, 224]
+        tensor = transform(rgb).unsqueeze(0).to(self.device)
 
         with torch.no_grad():
-            logits = self.model(tensor)                    # [1, 5]
-            probs = torch.softmax(logits, dim=1)[0]        # [5]
-            class_probs = probs.tolist()
-            ai_grade = int(torch.argmax(probs).item())
+            logits = self.model(tensor)
+            probabilities = torch.softmax(logits, dim=1)[0]
 
-        # Referable probability = sum of grades 2–4
-        referable_probability = sum(class_probs[2:])
+        class_probs = [
+            float(probability.item())
+            for probability in probabilities
+        ]
+
+        ai_grade = int(torch.argmax(probabilities).item())
+
+        # By the project's clinical policy, Grades 2, 3, and 4 are referable.
+        referable_probability = float(sum(class_probs[2:]))
+
+        logger.debug(
+            "REAL predict: grade=%d, referable_prob=%.4f",
+            ai_grade,
+            referable_probability,
+        )
 
         return ClassificationOutput(
             ai_grade=ai_grade,
             referable_probability=round(referable_probability, 4),
-            class_probabilities=[round(p, 4) for p in class_probs],
+            class_probabilities=[
+                round(probability, 4)
+                for probability in class_probs
+            ],
         )
 
     def _stub_predict(self, image: np.ndarray) -> ClassificationOutput:
         """
-        Generate a deterministic-ish mock prediction based on image content.
-
-        Uses a hash of pixel data so the same image always returns the
-        same stub result — helpful for consistent integration testing.
+        Generate deterministic mock output when classifier.pt is absent.
         """
-        # Derive a seed from the image so results are repeatable per image
         pixel_hash = hashlib.md5(image.tobytes()[:4096]).hexdigest()
         seed = int(pixel_hash[:8], 16) % 100
 
-        # Distribute grades: ~30% grade 0, ~20% grade 1, ~20% grade 2,
-        # ~15% grade 3, ~15% grade 4
         if seed < 30:
             grade = 0
         elif seed < 50:
@@ -203,18 +207,25 @@ class DRClassifier:
         else:
             grade = 4
 
-        # Generate plausible class probabilities
         rng = random.Random(seed)
         raw = [rng.random() for _ in range(5)]
-        raw[grade] += 3.0  # Boost the "correct" class
+        raw[grade] += 3.0
         total = sum(raw)
-        class_probs = [round(r / total, 4) for r in raw]
 
-        referable_probability = round(sum(class_probs[2:]), 4)
+        class_probs = [
+            round(value / total, 4)
+            for value in raw
+        ]
+
+        referable_probability = round(
+            sum(class_probs[2:]),
+            4,
+        )
 
         logger.debug(
             "STUB predict: grade=%d, referable_prob=%.4f",
-            grade, referable_probability,
+            grade,
+            referable_probability,
         )
 
         return ClassificationOutput(

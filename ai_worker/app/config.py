@@ -41,12 +41,16 @@ class Settings(BaseSettings):
 
     # ── Derived helpers ─────────────────────────────────────
     @property
+    def project_root(self) -> Path:
+        return Path(__file__).resolve().parents[1]
+
+    @property
     def classifier_weights(self) -> Path:
-        return Path(self.classifier_weights_path)
+        return self.project_root / self.classifier_weights_path
 
     @property
     def detector_weights(self) -> Path:
-        return Path(self.detector_weights_path)
+        return self.project_root / self.detector_weights_path
 
     @property
     def origins_list(self) -> list[str]:
