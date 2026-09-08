@@ -1,0 +1,91 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] -----------------------< com.netra:backend_java >-----------------------
+[INFO] Building  0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] >>> spring-boot:4.1.1:run (default-cli) > test-compile @ backend_java >>>
+[INFO] 
+[INFO] --- resources:3.5.0:resources (default-resources) @ backend_java ---
+[INFO] Copying 1 resource from src/main/resources to target/classes
+[INFO] Copying 2 resources from src/main/resources to target/classes
+[INFO] 
+[INFO] --- compiler:3.15.0:compile (default-compile) @ backend_java ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- resources:3.5.0:testResources (default-testResources) @ backend_java ---
+[INFO] skip non existing resourceDirectory /Users/ad1tyq/Documents/padhai/programming/web dev/Projects/hackathon/IIC 3.0/netra/backend_java/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.15.0:testCompile (default-testCompile) @ backend_java ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] <<< spring-boot:4.1.1:run (default-cli) < test-compile @ backend_java <<<
+[INFO] 
+[INFO] 
+[INFO] --- spring-boot:4.1.1:run (default-cli) @ backend_java ---
+[INFO] Attaching agents: []
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.1.1)
+
+2026-09-08T23:08:37.658+05:30  INFO 92916 --- [backend_java] [           main] c.n.backend_java.BackendJavaApplication  : Starting BackendJavaApplication using Java 21.0.5 with PID 92916 (/Users/ad1tyq/Documents/padhai/programming/web dev/Projects/hackathon/IIC 3.0/netra/backend_java/target/classes started by ad1tyq in /Users/ad1tyq/Documents/padhai/programming/web dev/Projects/hackathon/IIC 3.0/netra/backend_java)
+2026-09-08T23:08:37.660+05:30  INFO 92916 --- [backend_java] [           main] c.n.backend_java.BackendJavaApplication  : No active profile set, falling back to 1 default profile: "default"
+2026-09-08T23:08:38.107+05:30  INFO 92916 --- [backend_java] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-09-08T23:08:38.148+05:30  INFO 92916 --- [backend_java] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 35 ms. Found 5 JPA repository interfaces.
+2026-09-08T23:08:38.530+05:30  INFO 92916 --- [backend_java] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8080 (http)
+2026-09-08T23:08:38.550+05:30  INFO 92916 --- [backend_java] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-09-08T23:08:38.550+05:30  INFO 92916 --- [backend_java] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.24]
+2026-09-08T23:08:38.584+05:30  INFO 92916 --- [backend_java] [           main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 889 ms
+2026-09-08T23:08:38.630+05:30  INFO 92916 --- [backend_java] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-09-08T23:08:38.754+05:30  INFO 92916 --- [backend_java] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@45292ec1
+2026-09-08T23:08:38.755+05:30  INFO 92916 --- [backend_java] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-09-08T23:08:38.857+05:30  INFO 92916 --- [backend_java] [           main] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-09-08T23:08:38.901+05:30  INFO 92916 --- [backend_java] [           main] org.hibernate.orm.core                   : HHH000001: Hibernate ORM core version 7.4.5.Final
+2026-09-08T23:08:39.200+05:30  INFO 92916 --- [backend_java] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-09-08T23:08:39.252+05:30  WARN 92916 --- [backend_java] [           main] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-09-08T23:08:39.263+05:30  INFO 92916 --- [backend_java] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:postgresql://localhost:5432/netradb]
+	Database driver: PostgreSQL JDBC Driver
+	Database dialect: PostgreSQLDialect
+	Database version: 14.18
+	Default catalog/schema: netradb/public
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-09-08T23:08:40.121+05:30  INFO 92916 --- [backend_java] [           main] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-09-08T23:08:40.176+05:30  INFO 92916 --- [backend_java] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-09-08T23:08:40.224+05:30  INFO 92916 --- [backend_java] [           main] o.s.d.j.r.query.QueryEnhancerFactories   : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-09-08T23:08:40.396+05:30  INFO 92916 --- [backend_java] [           main] eAuthenticationProviderManagerConfigurer : Global AuthenticationManager configured with AuthenticationProvider bean with name authenticationProvider
+2026-09-08T23:08:40.396+05:30  WARN 92916 --- [backend_java] [           main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
+2026-09-08T23:08:40.501+05:30  WARN 92916 --- [backend_java] [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-09-08T23:08:40.842+05:30  INFO 92916 --- [backend_java] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8080 (http) with context path '/'
+2026-09-08T23:08:40.846+05:30  INFO 92916 --- [backend_java] [           main] c.n.backend_java.BackendJavaApplication  : Started BackendJavaApplication in 3.48 seconds (process running for 3.734)
+2026-09-08T23:09:02.859+05:30  INFO 92916 --- [backend_java] [nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-09-08T23:09:02.860+05:30  INFO 92916 --- [backend_java] [nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-09-08T23:09:02.870+05:30  INFO 92916 --- [backend_java] [nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 10 ms
+Hibernate: select u1_0.id,u1_0.clinic_id,u1_0.created_at,u1_0.email,u1_0.full_name,u1_0.is_active,u1_0.password_hash,u1_0.role from users u1_0 where u1_0.email=?
+Hibernate: select u1_0.id,u1_0.clinic_id,u1_0.created_at,u1_0.email,u1_0.full_name,u1_0.is_active,u1_0.password_hash,u1_0.role from users u1_0 where u1_0.email=?
+Hibernate: select u1_0.id,u1_0.clinic_id,u1_0.created_at,u1_0.email,u1_0.full_name,u1_0.is_active,u1_0.password_hash,u1_0.role from users u1_0 where u1_0.email=?
+Hibernate: select u1_0.id,u1_0.clinic_id,u1_0.created_at,u1_0.email,u1_0.full_name,u1_0.is_active,u1_0.password_hash,u1_0.role from users u1_0 where u1_0.email=?
+Hibernate: select c1_0.id,c1_0.created_at,c1_0.has_specialist,c1_0.latitude,c1_0.longitude,c1_0.name,c1_0.tier from clinics c1_0 where c1_0.id=?
+Hibernate: select u1_0.id,u1_0.clinic_id,u1_0.created_at,u1_0.email,u1_0.full_name,u1_0.is_active,u1_0.password_hash,u1_0.role from users u1_0 where u1_0.id=?
+Hibernate: insert into patients (client_uuid,clinic_id,created_at,created_by,demographics,is_diabetic,rbs_level,id) values (?,?,?,?,?,?,?,?)
+Hibernate: select u1_0.id,u1_0.clinic_id,u1_0.created_at,u1_0.email,u1_0.full_name,u1_0.is_active,u1_0.password_hash,u1_0.role from users u1_0 where u1_0.email=?
+Hibernate: select p1_0.id,p1_0.client_uuid,p1_0.clinic_id,p1_0.created_at,p1_0.created_by,p1_0.demographics,p1_0.is_diabetic,p1_0.rbs_level from patients p1_0 where p1_0.id=?
+Hibernate: select u1_0.id,u1_0.clinic_id,u1_0.created_at,u1_0.email,u1_0.full_name,u1_0.is_active,u1_0.password_hash,u1_0.role from users u1_0 where u1_0.email=?
+Hibernate: insert into screenings (ai_grade,client_uuid,created_at,decision_threshold,eye,is_referable,patient_id,performed_by,quality_status,referable_probability,status,id) values (?,?,?,?,?,?,?,?,?,?,?,?)
+Hibernate: insert into lesions (box_xmax,box_xmin,box_ymax,box_ymin,confidence,created_at,lesion_type,screening_id,id) values (?,?,?,?,?,?,?,?,?)
+Hibernate: insert into lesions (box_xmax,box_xmin,box_ymax,box_ymin,confidence,created_at,lesion_type,screening_id,id) values (?,?,?,?,?,?,?,?,?)
+Hibernate: insert into lesions (box_xmax,box_xmin,box_ymax,box_ymin,confidence,created_at,lesion_type,screening_id,id) values (?,?,?,?,?,?,?,?,?)
+Hibernate: select u1_0.id,u1_0.clinic_id,u1_0.created_at,u1_0.email,u1_0.full_name,u1_0.is_active,u1_0.password_hash,u1_0.role from users u1_0 where u1_0.email=?
+Hibernate: select l1_0.id,l1_0.box_xmax,l1_0.box_xmin,l1_0.box_ymax,l1_0.box_ymin,l1_0.confidence,l1_0.created_at,l1_0.lesion_type,l1_0.screening_id from lesions l1_0 where l1_0.screening_id=?
