@@ -32,6 +32,7 @@ public class ScreeningService {
     private final LesionRepository lesionRepository;
     private final PatientRepository patientRepository;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
     @Transactional
     public ScreeningResponse processScreening(MultipartFile file, UUID patientId, String eye) {
@@ -80,6 +81,15 @@ public class ScreeningService {
         }
 
         lesionRepository.saveAll(screening.getLesions());
+
+        if (isReferable) {
+            try {
+                notificationService.dispatchReferralNotification(screening.getId(), "WHATSAPP");
+            } catch (Exception e) {
+                // Log failure but don't break the screening transaction
+                System.err.println("Failed to dispatch notification: " + e.getMessage());
+            }
+        }
 
         return mapToResponse(screening);
     }
