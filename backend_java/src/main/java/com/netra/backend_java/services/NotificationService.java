@@ -20,7 +20,7 @@ public class NotificationService {
 
     private final NotificationRepository notificationRepository;
     private final ScreeningRepository screeningRepository;
-    private final WhatsAppMockGateway whatsAppMockGateway;
+    private final TwilioGateway twilioGateway;
 
     // This is called by ScreeningService when a referable screening is saved,
     // or manually via the controller for testing.
@@ -34,11 +34,18 @@ public class NotificationService {
         
         // For the mock demo, we just route them to Jaipur District Hospital or a generic clinic
         String targetClinic = "Jaipur District Tertiary Hospital";
+        
+        // The phone number should come from patient demographics. Using a mock fallback for now.
+        String phoneNumber = patient.getDemographics().containsKey("phone") ?
+                             patient.getDemographics().get("phone").toString() : "+1234567890";
+                             
+        String passportUrl = "https://netra.clinic/passport/" + screeningId.toString();
 
         Map<String, Object> payload = new HashMap<>();
         payload.put("template", "netra_urgent_referral");
         payload.put("patientName", patientName);
         payload.put("targetClinic", targetClinic);
+        payload.put("passportUrl", passportUrl);
 
         // 1. Create the QUEUED notification record
         Notification notification = Notification.builder()
@@ -50,8 +57,25 @@ public class NotificationService {
         
         notification = notificationRepository.save(notification);
 
-        // 2. Dispatch via the Mock Gateway
-        String providerId = whatsAppMockGateway.sendMockMessage(patientName, "netra_urgent_referral", targetClinic);
+        // 2. Dispatch via the Twilio Gateway with Fallback logic
+        String providerId;
+        try {
+            if ("SMS".equalsIgnoreCase(channel)) {
+                providerId = twilioGateway.sendSms(phoneNumber, patientName, targetClinic, passportUrl);
+            } else {
+                // Try WhatsApp first
+                try {
+                    providerId = twilioGateway.sendWhatsApp(phoneNumber, patientName, targetClinic, passportUrl);
+                } catch (Exception e) {
+                    // WhatsApp failed, fallback to SMS
+                    notification.setChannel("SMS_FALLBACK");
+                    providerId = twilioGateway.sendSms(phoneNumber, patientName, targetClinic, passportUrl);
+                }
+            }
+        } catch (Exception e) {
+            notification.setStatus("FAILED");
+            return notificationRepository.save(notification);
+        }
 
         // 3. Update status to SENT
         notification.setProviderMessageId(providerId);

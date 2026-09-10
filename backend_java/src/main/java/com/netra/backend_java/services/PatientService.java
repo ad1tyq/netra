@@ -14,7 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +25,12 @@ public class PatientService {
     private final PatientRepository patientRepository;
     private final ClinicRepository clinicRepository;
     private final UserRepository userRepository;
+
+    public List<PatientResponse> getAllPatients() {
+        return patientRepository.findAll().stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
 
     @Transactional
     public PatientResponse registerPatient(PatientRegistrationRequest request) {

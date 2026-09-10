@@ -25,12 +25,14 @@ class ExposureStatus(str, Enum):
 class Recommendation(str, Enum):
     ROUTINE_ANNUAL_CHECK = "ROUTINE_ANNUAL_CHECK"
     URGENT_REFERRAL = "URGENT_REFERRAL"
+    URGENT_MACULAR_REFERRAL = "URGENT_MACULAR_REFERRAL"
 
 
 class LesionType(str, Enum):
     MICROANEURYSM = "MICROANEURYSM"
     HAEMORRHAGE = "HAEMORRHAGE"
     EXUDATE = "EXUDATE"
+    MACULAR_EDEMA = "MACULAR_EDEMA"
 
 
 class QualityStatus(str, Enum):

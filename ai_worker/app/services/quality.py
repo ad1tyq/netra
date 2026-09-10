@@ -81,13 +81,18 @@ class QualityAssessor:
 
     def _compute_exposure(self, image: np.ndarray) -> ExposureStatus:
         """
-        Assess exposure via mean pixel intensity of the grayscale image.
+        Assess exposure via mean pixel intensity of the retinal area.
 
         Returns:
             ExposureStatus enum value.
         """
         gray = to_grayscale(image)
-        mean_intensity = float(np.mean(gray))
+        retinal_pixels = gray[gray > 15]
+        mean_intensity = (
+            float(np.mean(retinal_pixels))
+            if len(retinal_pixels) > (gray.size * 0.05)
+            else float(np.mean(gray))
+        )
 
         if mean_intensity < self.exposure_low:
             return ExposureStatus.UNDEREXPOSED

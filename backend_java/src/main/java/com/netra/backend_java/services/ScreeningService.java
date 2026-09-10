@@ -36,12 +36,13 @@ public class ScreeningService {
 
     @Transactional
     public ScreeningResponse processScreening(MultipartFile file, UUID patientId, String eye) {
-        
+
         Patient patient = patientRepository.findById(patientId)
                 .orElseThrow(() -> new RuntimeException("Patient not found"));
 
         // Get currently authenticated user (Technician)
-        String email = ((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
+        String email = ((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal())
+                .getUsername();
         User currentUser = userRepository.findByEmail(email).orElseThrow();
 
         // Call Python AI Worker
@@ -57,15 +58,27 @@ public class ScreeningService {
         screening.setEye(eye);
         screening.setAiGrade(aiResponse.getScreening_result().getAi_grade());
         screening.setReferableProbability(aiResponse.getScreening_result().getReferable_probability());
-        
+
         boolean isReferable = "URGENT_REFERRAL".equals(aiResponse.getRecommendation());
         screening.setIsReferable(isReferable);
-        
+
         screening.setQualityStatus("GRADABLE");
         screening.setStatus("GRADED");
         screening.setPerformedBy(currentUser);
 
         screening = screeningRepository.save(screening);
+
+        // Save image to disk for client fundus viewing
+        try {
+            java.nio.file.Path uploadsDir = java.nio.file.Paths.get("uploads", "screenings");
+            if (!java.nio.file.Files.exists(uploadsDir)) {
+                java.nio.file.Files.createDirectories(uploadsDir);
+            }
+            java.nio.file.Path targetFile = uploadsDir.resolve(screening.getId().toString() + ".jpg");
+            java.nio.file.Files.write(targetFile, file.getBytes());
+        } catch (Exception e) {
+            System.err.println("Could not save screening image to disk: " + e.getMessage());
+        }
 
         // Build Lesions
         for (AiLesion aiLesion : aiResponse.getLesions()) {
@@ -94,6 +107,18 @@ public class ScreeningService {
         return mapToResponse(screening);
     }
 
+    public byte[] getScreeningImage(UUID id) {
+        try {
+            java.nio.file.Path targetFile = java.nio.file.Paths.get("uploads", "screenings", id.toString() + ".jpg");
+            if (java.nio.file.Files.exists(targetFile)) {
+                return java.nio.file.Files.readAllBytes(targetFile);
+            }
+        } catch (Exception e) {
+            System.err.println("Error reading screening image: " + e.getMessage());
+        }
+        return null;
+    }
+
     public ScreeningResponse getScreening(UUID id) {
         Screening screening = screeningRepository.findById(id).orElseThrow();
         return mapToResponse(screening);
@@ -105,19 +130,56 @@ public class ScreeningService {
                 .collect(Collectors.toList());
     }
 
+    public List<ScreeningResponse> getAllScreenings() {
+        return screeningRepository.findAll().stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
     private ScreeningResponse mapToResponse(Screening screening) {
+        String patientName = null;
+        Integer patientAge = null;
+        String patientGender = null;
+        String patientPhone = null;
+        String clinicName = null;
+
+        if (screening.getPatient() != null) {
+            java.util.Map<String, Object> demo = screening.getPatient().getDemographics();
+            if (demo != null) {
+                patientName = demo.get("name") != null ? demo.get("name").toString() : null;
+                if (demo.get("age") != null) {
+                    try {
+                        patientAge = Integer.parseInt(demo.get("age").toString());
+                    } catch (Exception ignored) {
+                    }
+                }
+                patientGender = demo.get("gender") != null ? demo.get("gender").toString() : null;
+                patientPhone = demo.get("phone") != null ? demo.get("phone").toString() : null;
+            }
+            if (screening.getPatient().getClinic() != null) {
+                clinicName = screening.getPatient().getClinic().getName();
+            }
+        }
+
         return ScreeningResponse.builder()
                 .id(screening.getId())
-                .patientId(screening.getPatient().getId())
+                .patientId(screening.getPatient() != null ? screening.getPatient().getId() : null)
                 .eye(screening.getEye())
                 .aiGrade(screening.getAiGrade())
                 .referableProbability(screening.getReferableProbability())
                 .isReferable(screening.getIsReferable())
                 .qualityStatus(screening.getQualityStatus())
                 .status(screening.getStatus())
-                .performedBy(screening.getPerformedBy().getId())
+                .performedBy(screening.getPerformedBy() != null ? screening.getPerformedBy().getId() : null)
                 .createdAt(screening.getCreatedAt())
-                .lesions(screening.getLesions().stream().map(this::mapLesionToResponse).collect(Collectors.toList()))
+                .lesions(screening.getLesions() != null
+                        ? screening.getLesions().stream().map(this::mapLesionToResponse).collect(Collectors.toList())
+                        : java.util.Collections.emptyList())
+                .patientName(patientName)
+                .patientAge(patientAge)
+                .patientGender(patientGender)
+                .patientPhone(patientPhone)
+                .clinicName(clinicName)
                 .build();
     }
 

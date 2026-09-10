@@ -1,0 +1,91 @@
+# ============================================================================
+# NETRA Platform — Docker Compose Orchestration
+# Services: PostgreSQL (DB), FastAPI (AI Worker), Spring Boot (Java), Next.js (Frontend)
+# ============================================================================
+
+services:
+  # ============================================================================
+  # 1. PostgreSQL Database Service
+  # ============================================================================
+  postgres:
+    image: postgres:16-alpine
+    container_name: netra-postgres
+    restart: always
+    environment:
+      POSTGRES_DB: netra
+      POSTGRES_USER: aayush
+      POSTGRES_PASSWORD: aayush
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U aayush -d netra"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ============================================================================
+  # 2. FastAPI AI Worker Service
+  # ============================================================================
+  ai-worker:
+    build:
+      context: ./ai_worker
+      dockerfile: Dockerfile
+    container_name: netra-ai-worker
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONUNBUFFERED=1
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/internal/ai/health')\" || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # ============================================================================
+  # 3. Spring Boot Java Backend Microservice
+  # ============================================================================
+  backend-java:
+    build:
+      context: ./backend_java
+      dockerfile: Dockerfile
+    container_name: netra-backend-java
+    restart: always
+    ports:
+      - "8081:8081"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      ai-worker:
+        condition: service_healthy
+    environment:
+      - DB_URL=jdbc:postgresql://postgres:5432/netra
+      - DB_USERNAME=aayush
+      - DB_PASSWORD=aayush
+      - JWT_SECRET=supersecretjwtkeynetraforauthentication32charsminimum
+      - JWT_EXPIRATION=86400000
+      - AI_WORKER_URL=http://ai-worker:8000
+    volumes:
+      - screening_uploads:/app/uploads/screenings
+
+  # ============================================================================
+  # 4. Next.js 16 Frontend Web Application
+  # ============================================================================
+  frontend-netra:
+    build:
+      context: ./frontend_netra
+      dockerfile: Dockerfile
+    container_name: netra-frontend
+    restart: always
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend-java
+    environment:
+      - BACKEND_URL=http://backend-java:8081
+
+volumes:
+  postgres_data:
+  screening_uploads:

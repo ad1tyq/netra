@@ -1,26 +1,352 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
+@theme {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  
+  /* Modern Cobalt & Sapphire Medical Palette */
+  --color-primary: #1d4ed8;
+  --color-primary-dark: #1e40af;
+  --color-primary-light: #eff6ff;
+  --color-primary-subtle: #dbeafe;
+  
+  /* Netra Eye Logo Accents */
+  --color-netra-crimson: #e11d48;
+  --color-netra-crimson-dark: #be123c;
+  --color-netra-crimson-light: #ffe4e6;
+  
+  --color-netra-amber: #d97706;
+  --color-netra-amber-light: #fef3c7;
+  --color-netra-navy: #0f172a;
+  
+  /* Neutral Medical Surfaces */
+  --color-surface: #f8fafc;
+  --color-surface-card: #ffffff;
+  
+  --color-danger: #e11d48;
+  --color-danger-light: #ffe4e6;
+  
+  --color-warning: #f59e0b;
+  --color-warning-light: #fef3c7;
+  
+  --color-success: #10b981;
+  --color-success-light: #ecfdf5;
+
+  --color-muted: #64748b;
+  --color-border: #e2e8f0;
+
+  --font-sans: var(--font-jakarta), system-ui, -apple-system, sans-serif;
+  --font-heading: var(--font-jakarta), system-ui, -apple-system, sans-serif;
+  
+  --radius-xl: 1rem;
+  --radius-2xl: 1.25rem;
+  --radius-3xl: 1.5rem;
+  --radius-4xl: 2rem;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+:root {
+  /* Ultra-clean Modernistic Light Medical Canvas */
+  color-scheme: light;
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  --card-bg: #ffffff;
+  --card-border: #e2e8f0;
+  --card-border-subtle: #f1f5f9;
+  --input-bg: #ffffff;
+  --input-border: #cbd5e1;
+  --nav-bg: rgba(255, 255, 255, 0.95);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  color-scheme: light;
 }
 
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+}
+
+/* One UI Smooth scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* ─── Modern Samsung One UI Card ─── */
+.oneui-card {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 1.5rem;
+  padding: 1.5rem;
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.04), 0 2px 6px -1px rgba(15, 23, 42, 0.02);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.oneui-card:hover {
+  box-shadow: 0 16px 36px -4px rgba(15, 23, 42, 0.08), 0 4px 12px -2px rgba(15, 23, 42, 0.03);
+}
+
+.oneui-hero-banner {
+  background: linear-gradient(135deg, #091e42 0%, #0f172a 55%, #172554 100%) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(59, 130, 246, 0.3) !important;
+  border-radius: 1.5rem;
+  box-shadow: 0 12px 32px -4px rgba(15, 23, 42, 0.25) !important;
+}
+.oneui-hero-banner h1,
+.oneui-hero-banner h2,
+.oneui-hero-banner h3 {
+  color: #ffffff !important;
+}
+.oneui-hero-banner p {
+  color: #bfdbfe !important;
+}
+
+.oneui-hero-banner-sky {
+  background: linear-gradient(135deg, #0c4a6e 0%, #0f172a 55%, #0369a1 100%) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(14, 165, 233, 0.3) !important;
+  border-radius: 1.5rem;
+  box-shadow: 0 12px 32px -4px rgba(15, 23, 42, 0.25) !important;
+}
+.oneui-hero-banner-sky h1,
+.oneui-hero-banner-sky h2,
+.oneui-hero-banner-sky h3 {
+  color: #ffffff !important;
+}
+.oneui-hero-banner-sky p {
+  color: #bae6fd !important;
+}
+
+.oneui-card-dark {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+  color: #ffffff !important;
+  border: 1px solid #334155 !important;
+  box-shadow: 0 20px 40px -15px rgba(15, 23, 42, 0.25) !important;
+}
+.oneui-card-dark h2,
+.oneui-card-dark h3 {
+  color: #ffffff !important;
+}
+.oneui-card-dark p {
+  color: #cbd5e1 !important;
+}
+
+.oneui-card-urgent {
+  border-left: 5px solid #e11d48;
+}
+
+.oneui-card-normal {
+  border-left: 5px solid #10b981;
+}
+
+.oneui-card-warning {
+  border-left: 5px solid #f59e0b;
+}
+
+/* ─── One UI Input ─── */
+.oneui-input {
+  width: 100%;
+  background: #ffffff;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 1rem;
+  padding: 0.875rem 1.25rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #0f172a;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.oneui-input:focus {
+  border-color: #1d4ed8;
+  box-shadow: 0 0 0 4px rgba(29, 78, 216, 0.12);
+}
+.oneui-input::placeholder {
+  color: #94a3b8;
+}
+
+/* ─── Tactile One UI Button ─── */
+.oneui-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  border-radius: 9999px;
+  padding: 0.8rem 1.5rem;
+  font-size: 0.9375rem;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+  border: none;
+  outline: none;
+  user-select: none;
+}
+.oneui-btn:active {
+  transform: scale(0.97);
+}
+
+.oneui-btn-primary {
+  background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(29, 78, 216, 0.28);
+}
+.oneui-btn-primary:hover {
+  background: linear-gradient(135deg, #1e40af 0%, #1d4ed8 100%);
+  box-shadow: 0 6px 20px rgba(29, 78, 216, 0.38);
+}
+
+.oneui-btn-crimson {
+  background: linear-gradient(135deg, #e11d48 0%, #be123c 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(225, 29, 72, 0.28);
+}
+.oneui-btn-crimson:hover {
+  background: linear-gradient(135deg, #be123c 0%, #9f1239 100%);
+  box-shadow: 0 6px 20px rgba(225, 29, 72, 0.38);
+}
+
+.oneui-btn-whatsapp {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.28);
+}
+.oneui-btn-whatsapp:hover {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.38);
+}
+
+.oneui-btn-outline {
+  background: #ffffff;
+  color: #0f172a;
+  border: 1.5px solid #cbd5e1;
+}
+.oneui-btn-outline:hover {
+  background: #f8fafc;
+  border-color: #94a3b8;
+}
+
+.oneui-btn-ghost {
+  background: transparent;
+  color: #475569;
+}
+.oneui-btn-ghost:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+/* ─── Badge Styles (Clear high-visibility One UI Pill) ─── */
+.oneui-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.35rem 0.85rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border-radius: 9999px;
+  letter-spacing: 0.02em;
+}
+.oneui-badge-danger {
+  background: #ffe4e6;
+  color: #be123c;
+  border: 1px solid #fecdd3;
+}
+.oneui-badge-warning {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
+}
+.oneui-badge-success {
+  background: #ecfdf5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+}
+.oneui-badge-info {
+  background: #eff6ff;
+  color: #1e40af;
+  border: 1px solid #bfdbfe;
+}
+.oneui-badge-neutral {
+  background: #f1f5f9;
+  color: #334155;
+  border: 1px solid #e2e8f0;
+}
+
+/* ─── Layout Containers (Full Responsive Web) ─── */
+.web-container {
+  width: 100%;
+  max-width: 80rem;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1.25rem;
+  padding-right: 1.25rem;
+}
+@media (min-width: 640px) {
+  .web-container {
+    padding-left: 1.75rem;
+    padding-right: 1.75rem;
+  }
+}
+@media (min-width: 1024px) {
+  .web-container {
+    padding-left: 2.5rem;
+    padding-right: 2.5rem;
+  }
+}
+
+/* ─── Section Header (Samsung style large titles) ─── */
+.oneui-heading-hero {
+  font-size: clamp(2.25rem, 4vw, 3.5rem);
+  font-weight: 800;
+  line-height: 1.12;
+  letter-spacing: -0.03em;
+  color: #0f172a;
+}
+.oneui-heading-title {
+  font-size: clamp(1.5rem, 2.5vw, 2.25rem);
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: #0f172a;
+}
+.oneui-heading-subtitle {
+  font-size: 1.05rem;
+  font-weight: 500;
+  line-height: 1.6;
+  color: #475569;
+}
+
+/* ─── Print Specific Styling for Diagnostic Passport ─── */
+@media print {
+  body {
+    background: #ffffff !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .print-only {
+    display: block !important;
+  }
+  .oneui-card {
+    border: 1px solid #000000 !important;
+    box-shadow: none !important;
+    page-break-inside: avoid;
+  }
 }

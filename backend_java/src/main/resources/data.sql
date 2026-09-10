@@ -3,10 +3,11 @@ INSERT INTO clinics (id, name, tier, latitude, longitude, has_specialist) VALUES
 ('a0000000-0000-0000-0000-000000000001', 'Dahmi Kalan Community Health Centre', 'CHC', 26.8500, 75.5600, false),
 ('a0000000-0000-0000-0000-000000000002', 'Jaipur District Tertiary Hospital', 'DISTRICT_HOSPITAL', 26.9124, 75.7873, true);
 
--- Insert Seed Users (Technician and Specialist)
+-- Insert Seed Users (Technician, Specialist, Admin)
 INSERT INTO users (id, full_name, role, clinic_id, email, password_hash) VALUES
-('b0000000-0000-0000-0000-000000000001', 'Priya Sharma', 'TECHNICIAN', 'a0000000-0000-0000-0000-000000000001', 'priya.tech@netra.ai', '$2a$10$7qiK3s3f.7R7K3s3f.7R7K3s3f.7R7K3s3f.7R7K3s3f.7R7K3s3'),
-('b0000000-0000-0000-0000-000000000002', 'Dr. Rameshwar Sharma', 'SPECIALIST', 'a0000000-0000-0000-0000-000000000002', 'dr.sharma@netra.ai', '$2a$10$7qiK3s3f.7R7K3s3f.7R7K3s3f.7R7K3s3f.7R7K3s3f.7R7K3s3');
+('b0000000-0000-0000-0000-000000000001', 'Priya Sharma', 'TECHNICIAN', 'a0000000-0000-0000-0000-000000000001', 'priya.tech@netra.ai', '$2b$10$AYiOFbWnf9EfUsAMmaspqu1quzeOzBB/9mhT.YQE595l0UeZuOGmG'),
+('b0000000-0000-0000-0000-000000000002', 'Dr. Rameshwar Sharma', 'SPECIALIST', 'a0000000-0000-0000-0000-000000000002', 'dr.sharma@netra.ai', '$2b$10$AYiOFbWnf9EfUsAMmaspqu1quzeOzBB/9mhT.YQE595l0UeZuOGmG'),
+('b0000000-0000-0000-0000-000000000003', 'Health Directorate Admin', 'ADMIN', 'a0000000-0000-0000-0000-000000000002', 'admin@netra.ai', '$2b$10$AYiOFbWnf9EfUsAMmaspqu1quzeOzBB/9mhT.YQE595l0UeZuOGmG');
 
 -- Insert Seed Patient (Ramesh)
 INSERT INTO patients (id, clinic_id, demographics, rbs_level, is_diabetic, created_by, client_uuid) VALUES

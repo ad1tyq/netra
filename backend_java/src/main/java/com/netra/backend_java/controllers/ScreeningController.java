@@ -20,7 +20,7 @@ public class ScreeningController {
 
     private final ScreeningService screeningService;
 
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = {"", "/upload"}, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ScreeningResponse> processScreening(
             @RequestPart("file") MultipartFile file,
             @RequestParam("patientId") UUID patientId,
@@ -28,6 +28,11 @@ public class ScreeningController {
 
         ScreeningResponse response = screeningService.processScreening(file, patientId, eye);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<ScreeningResponse>> getAllScreenings() {
+        return ResponseEntity.ok(screeningService.getAllScreenings());
     }
 
     @GetMapping("/{id}")
@@ -38,5 +43,16 @@ public class ScreeningController {
     @GetMapping("/{id}/lesions")
     public ResponseEntity<List<LesionResponse>> getLesionsForScreening(@PathVariable UUID id) {
         return ResponseEntity.ok(screeningService.getLesionsForScreening(id));
+    }
+
+    @GetMapping(value = "/{id}/image", produces = MediaType.IMAGE_JPEG_VALUE)
+    public ResponseEntity<byte[]> getScreeningImage(@PathVariable UUID id) {
+        byte[] img = screeningService.getScreeningImage(id);
+        if (img == null || img.length == 0) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok()
+                .contentType(MediaType.IMAGE_JPEG)
+                .body(img);
     }
 }

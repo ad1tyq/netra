@@ -21,4 +21,9 @@ public class ScreeningResponse {
     private UUID performedBy;
     private LocalDateTime createdAt;
     private List<LesionResponse> lesions;
+    private String patientName;
+    private Integer patientAge;
+    private String patientGender;
+    private String patientPhone;
+    private String clinicName;
 }
